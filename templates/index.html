@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qysqa.kz - Интеллектуальная платформа для подготовки к экзаменам</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        :root {
+            --bg-primary: #1a1d21;
+            --bg-secondary: #23262b;
+            --bg-tertiary: #2a2e33;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b7c2;
+            --accent-blue: #4071ff;
+            --accent-green: #36b37e;
+            --icon-color: #fb4e4e;
+            --border-color: #383e47;
+            --highlight: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 320px;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+        }
+
+        .sidebar-header, .main-header {
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .btn:hover {
+            background-color: var(--highlight);
+        }
+
+        .btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .source-list {
+            margin-top: 1rem;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .select-all {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .source-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .source-item:hover {
+            background-color: var(--highlight);
+        }
+
+        .source-item.selected {
+            background-color: rgba(64, 113, 255, 0.1);
+            border-left: 3px solid var(--accent-blue);
+        }
+
+        .source-icon {
+            color: var(--icon-color);
+            margin-right: 0.75rem;
+        }
+
+        .source-icon.pdf-icon {
+            color: #e94235;
+        }
+
+        .source-icon.docx-icon {
+            color: #4285f4;
+        }
+
+        .source-icon.pptx-icon {
+            color: #fa7b17;
+        }
+
+        .source-icon.txt-icon {
+            color: #34a853;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: auto;
+        }
+
+        .checkbox.checked {
+            background-color: var(--accent-blue);
+            color: white;
+        }
+
+        .main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 120px);
+        }
+
+        .globe-icon {
+            width: 48px;
+            height: 48px;
+            background-color: #4071ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .content-header {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .sources-count {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .content-text {
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .highlight {
+            color: var(--text-primary);
+        }
+
+        .green-text {
+            color: var(--accent-green);
+        }
+
+        .input-container {
+            position: relative;
+            margin-top: auto;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--bg-primary);
+            z-index: 1;
+        }
+
+        .input-wrapper {
+            display: flex;
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 0.5rem;
+        }
+
+        .input-field {
+            flex-grow: 1;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .input-field::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .sources-indicator {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            padding: 0 0.75rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .send-btn {
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .send-btn:hover {
+            background-color: #3562e0;
+        }
+
+        .suggested-question {
+            background-color: var(--bg-secondary);
+            border-radius: 9999px;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .suggested-question:hover {
+            background-color: var(--highlight);
+        }
+
+        .action-bar {
+            display: flex;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background-color: var(--highlight);
+            color: var(--text-primary);
+        }
+
+        .document-icon {
+            margin-right: 0.25rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 10;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal-header {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .file-upload {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .file-upload-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-blue);
+        }
+
+        .file-upload-text {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--accent-blue);
+            color: white;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-input-label:hover {
+            background-color: #3562e0;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            overflow-y: auto;
+            padding-right: 1rem;
+            scroll-behavior: smooth;
+            flex-grow: 1;
+            max-height: none;
+        }
+
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 3px;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 12px;
+            max-width: 80%;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: var(--accent-blue);
+            color: white;
+            margin-left: auto;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            margin-right: auto;
+        }
+
+        .message-content {
+            line-height: 1.5;
+        }
+
+        .message-content pre {
+            background-color: var(--bg-secondary);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 0.5rem 0;
+        }
+
+        .message-content code {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9em;
+        }
+
+        /* Enhanced Markdown styles */
+        .message-content h1, .message-content h2, .message-content h3, 
+        .message-content h4, .message-content h5, .message-content h6 {
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            line-height: 1.25;
+        }
+        
+        .message-content h1 { font-size: 1.6em; }
+        .message-content h2 { font-size: 1.4em; }
+        .message-content h3 { font-size: 1.2em; }
+        
+        .message-content p {
+            margin-bottom: 0.8rem;
+        }
+        
+        .message-content ul, .message-content ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+        
+        .message-content li {
+            margin-bottom: 0.3rem;
+        }
+        
+        .message-content blockquote {
+            border-left: 3px solid var(--accent-blue);
+            padding-left: 1rem;
+            margin-left: 0;
+            color: var(--text-secondary);
+        }
+        
+        .message-content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+            display: block;
+        }
+        
+        .message-content th, .message-content td {
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            text-align: left;
+        }
+        
+        .message-content th {
+            background-color: var(--bg-tertiary);
+        }
+        
+        .message-content a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+        
+        .message-content a:hover {
+            text-decoration: underline;
+        }
+        
+        .message-content img {
+            max-width: 100%;
+            height: auto;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: var(--text-primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tab-button.active {
+            color: var(--text-primary);
+        }
+
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent-blue);
+        }
+
+        .tab-content {
+            display: none;
+            height: 100%;
+            flex-direction: column;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        .test-container {
+            margin-top: 1rem;
+        }
+
+        .test-question {
+            background-color: var(--bg-tertiary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .test-question h3 {
+            margin-bottom: 1rem;
+            color: var(--accent-blue);
+        }
+
+        .question-source {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            padding: 0.4rem 0.7rem;
+            background-color: var(--bg-secondary);
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .options {
+            margin: 1.5rem 0;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: var(--bg-secondary);
+        }
+
+        .option:hover {
+            background-color: var(--highlight);
+        }
+
+        .option input[type="radio"] {
+            margin-right: 0.75rem;
+        }
+
+        .option.correct-option {
+            background-color: rgba(54, 179, 126, 0.2);
+            border-left: 3px solid var(--accent-green);
+        }
+
+        .option.incorrect-option {
+            background-color: rgba(251, 78, 78, 0.2);
+            border-left: 3px solid var(--icon-color);
+        }
+
+        .answer-explanation {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: var(--bg-secondary);
+            border-radius: 6px;
+            border-left: 3px solid var(--accent-blue);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .correct-answer {
+            margin-bottom: 0.5rem;
+            color: var(--accent-green);
+        }
+
+        .explanation {
+            color: var(--text-secondary);
+        }
+
+        .check-answer-btn {
+            margin-top: 1rem;
+            padding: 0.6rem 1.2rem;
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .check-answer-btn:hover {
+            background-color: #3562e0;
+        }
+
+        .check-answer-btn:disabled {
+            background-color: var(--bg-secondary);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        /* Open question styles */
+        .open-question textarea {
+            width: 100%;
+            min-height: 120px;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.75rem;
+            color: var(--text-primary);
+            margin: 1rem 0;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .open-question-feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .open-question-score {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-value {
+            margin-left: auto;
+            background-color: var(--bg-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .good-score {
+            color: var(--accent-green);
+        }
+
+        .medium-score {
+            color: #f5a623;
+        }
+
+        .bad-score {
+            color: var(--icon-color);
+        }
+
+        .test-score {
+            text-align: center;
+            margin: 2rem 0;
+            padding: 1rem;
+            background-color: var(--bg-tertiary);
+            border-radius: 8px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        #show-all-answers {
+            display: block;
+            margin: 1.5rem auto;
+            background-color: var(--accent-blue);
+        }
+
+        .error-message {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem;
+            background-color: rgba(251, 78, 78, 0.1);
+            border-radius: 8px;
+            margin: 1rem 0;
+            align-items: flex-start;
+        }
+
+        .error-message svg {
+            color: var(--icon-color);
+            flex-shrink: 0;
+        }
+
+        .error-message h3 {
+            margin-bottom: 0.5rem;
+            color: var(--icon-color);
+        }
+
+        .error-message p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--border-color);
+        }
+
+        .empty-state-text {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .summary-area {
+            background-color: var(--bg-tertiary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            white-space: pre-line;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            padding: 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            animation: slide-in 0.3s ease-out;
+        }
+
+        .notification svg {
+            color: var(--icon-color);
+        }
+
+        .notification.success-notification svg {
+            color: var(--accent-green);
+        }
+
+        .notification.fade-out {
+            animation: fade-out 0.3s ease-in forwards;
+        }
+
+        .file-info {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .error-details {
+            font-size: 0.9em;
+            color: var(--icon-color);
+            margin: 0.5rem 0;
+            background-color: rgba(251, 78, 78, 0.1);
+            padding: 0.5rem;
+            border-radius: 4px;
+            max-width: 100%;
+            overflow-wrap: break-word;
+        }
+
+        .highlight-pulse {
+            animation: pulse 2s ease-in-out;
+            border-color: var(--accent-blue) !important;
+        }
+
+        @keyframes slide-in {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fade-out {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(64, 113, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(64, 113, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(64, 113, 255, 0); }
+        }
+
+        .source-tab.active {
+            color: var(--text-primary) !important;
+            font-weight: 500;
+        }
+        
+        .source-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent-blue);
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <span>Источники</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn" id="add-source-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Добавить
+            </button>
+            <button class="btn" id="generate-test-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Тест
+            </button>
+        </div>
+
+        <div class="source-list" id="source-list">
+            <div class="select-all">
+                <span>Выбрать все источники</span>
+                <div class="checkbox" id="select-all-checkbox">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+            </div>
+
+            <div id="sources-container">
+                <!-- Sources will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="main-header">
+            <div class="tab-buttons">
+                <button class="tab-button active" data-tab="chat">Чат</button>
+                <button class="tab-button" data-tab="summary">Конспект</button>
+                <button class="tab-button" data-tab="test">Тест</button>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="tab-content active" id="chat-tab">
+                <div id="initial-content">
+                    <div class="globe-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                        </svg>
+                    </div>
+                    <h1 class="content-header">Qysqa.kz - Учитесь эффективно</h1>
+                    <p class="sources-count" id="sources-count">0 источников</p>
+
+                    <p class="content-text">
+                        Добро пожаловать на интеллектуальную платформу для подготовки к экзаменам. Загрузите ваши материалы, чтобы получить автоматически сгенерированные конспекты и тесты. Вы также можете задать вопросы ИИ-ассистенту по загруженным материалам.
+                    </p>
+
+                    <div class="empty-state" id="empty-state">
+                        <div class="empty-state-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                        </div>
+                        <div class="empty-state-text">Добавьте материалы, чтобы начать</div>
+                        <button class="btn" id="add-source-empty-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Добавить материалы
+                        </button>
+                    </div>
+                </div>
+
+                <div class="chat-container" id="chat-container">
+                    <!-- Chat messages will appear here -->
+                </div>
+            </div>
+
+            <div class="tab-content" id="summary-tab">
+                <div class="summary-container">
+                    <h2 class="content-header">Конспект</h2>
+                    <div id="summary-content">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="empty-state-text">Добавьте материалы для генерации конспекта</div>
+                            <button class="btn" id="generate-summary-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="1 4 1 10 7 10"></polyline>
+                                    <polyline points="23 20 23 14 17 14"></polyline>
+                                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                                </svg>
+                                Создать конспект
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="test-tab">
+                <div class="test-container">
+                    <h2 class="content-header">Тестовые вопросы</h2>
+                    <div id="test-content">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="empty-state-text">Добавьте материалы для генерации теста</div>
+                            <button class="btn" id="create-test-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                                </svg>
+                                Создать тест
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <div class="input-wrapper">
+                <input type="text" class="input-field" id="chat-input" placeholder="Задайте вопрос по материалам...">
+                <div class="sources-indicator" id="selected-sources-count">0 источников</div>
+                <button class="send-btn" id="send-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add File Modal -->
+    <div class="modal" id="add-file-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close">×</button>
+            <h2 class="modal-header">Добавить материалы</h2>
+            
+            <!-- Tab navigation for different source types -->
+            <div class="source-tabs" style="display: flex; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color);">
+                <button class="source-tab active" data-tab="file-upload" style="flex: 1; padding: 0.75rem; background: none; border: none; color: var(--text-primary); cursor: pointer; position: relative;">Файл</button>
+                <button class="source-tab" data-tab="youtube-upload" style="flex: 1; padding: 0.75rem; background: none; border: none; color: var(--text-secondary); cursor: pointer; position: relative;">YouTube</button>
+                <button class="source-tab" data-tab="clipboard-upload" style="flex: 1; padding: 0.75rem; background: none; border: none; color: var(--text-secondary); cursor: pointer; position: relative;">Буфер</button>
+                <button class="source-tab" data-tab="website-upload" style="flex: 1; padding: 0.75rem; background: none; border: none; color: var(--text-secondary); cursor: pointer; position: relative;">Сайт</button>
+            </div>
+            
+            <!-- File upload tab -->
+            <div class="source-tab-content active" id="file-upload-tab">
+                <div class="file-upload" id="file-upload-area">
+                    <div class="file-upload-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </div>
+                    <p class="file-upload-text">Перетащите файлы сюда или нажмите, чтобы выбрать</p>
+                    <label for="file-input" class="file-input-label">Выбрать файл</label>
+                    <input type="file" id="file-input" class="file-input" accept=".pdf,.txt,.doc,.docx,.ppt,.pptx">
+                </div>
+                <p style="color: var(--text-secondary); text-align: center;">Поддерживаемые форматы: PDF, Word, PowerPoint, TXT</p>
+            </div>
+            
+            <!-- YouTube URL tab -->
+            <div class="source-tab-content" id="youtube-upload-tab" style="display: none;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="margin-bottom: 1rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#FF0000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
+                            <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="#FF0000"></polygon>
+                        </svg>
+                    </div>
+                    <p class="file-upload-text" style="margin-bottom: 1rem;">Добавьте ссылку на видео YouTube, чтобы извлечь его транскрипцию</p>
+                    <div style="position: relative; margin-bottom: 1rem;">
+                        <input type="text" id="youtube-url-input" placeholder="https://www.youtube.com/watch?v=..." style="width: 100%; padding: 0.75rem; background-color: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary);">
+                    </div>
+                    <button id="add-youtube-btn" class="file-input-label" style="background-color: #FF0000;">Добавить видео</button>
+                </div>
+                <p style="color: var(--text-secondary); text-align: center;">Видео должно иметь субтитры на русском, английском или казахском языке</p>
+            </div>
+            
+            <!-- Clipboard text tab -->
+            <div class="source-tab-content" id="clipboard-upload-tab" style="display: none;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="margin-bottom: 1rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#36b37e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                        </svg>
+                    </div>
+                    <p class="file-upload-text" style="margin-bottom: 1rem;">Вставьте текст из буфера обмена</p>
+                    <div style="position: relative; margin-bottom: 1rem;">
+                        <textarea id="clipboard-text-input" placeholder="Вставьте текст сюда..." style="width: 100%; min-height: 200px; padding: 0.75rem; background-color: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); resize: vertical;"></textarea>
+                    </div>
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <button id="paste-text-btn" class="file-input-label" style="background-color: var(--bg-tertiary); color: var(--text-primary);">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                            </svg>
+                            Вставить из буфера
+                        </button>
+                        <button id="add-clipboard-btn" class="file-input-label" style="background-color: var(--accent-green);">Добавить текст</button>
+                    </div>
+                </div>
+                <p style="color: var(--text-secondary); text-align: center;">Текст будет добавлен как новый источник</p>
+            </div>
+            
+            <!-- Website content tab -->
+            <div class="source-tab-content" id="website-upload-tab" style="display: none;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="margin-bottom: 1rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4071ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                        </svg>
+                    </div>
+                    <p class="file-upload-text" style="margin-bottom: 1rem;">Добавьте URL веб-страницы, чтобы извлечь её содержимое</p>
+                    <div style="position: relative; margin-bottom: 1rem;">
+                        <input type="text" id="website-url-input" placeholder="https://example.com/article..." style="width: 100%; padding: 0.75rem; background-color: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary);">
+                    </div>
+                    <button id="add-website-btn" class="file-input-label" style="background-color: var(--accent-blue);">Добавить веб-страницу</button>
+                </div>
+                <p style="color: var(--text-secondary); text-align: center;">Основное содержимое страницы будет извлечено и добавлено как источник</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generate Test Modal -->
+    <div class="modal" id="generate-test-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="test-modal-close">×</button>
+            <h2 class="modal-header">Создать тест</h2>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Количество вопросов</label>
+                <input type="number" id="num-questions" min="1" max="10" value="5" style="width: 100%; padding: 0.75rem; background-color: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary);">
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Типы вопросов</label>
+                <div style="display: flex; gap: 1rem;">
+                    <div style="flex: 1;">
+                        <label style="display: flex; align-items: center; margin-bottom: 0.5rem; color: var(--text-primary);">
+                            <span style="margin-right: 0.5rem;">С выбором ответа</span>
+                            <input type="number" id="closed-questions" min="0" max="10" value="5" style="width: 60px; padding: 0.5rem; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary);">
+                        </label>
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display: flex; align-items: center; margin-bottom: 0.5rem; color: var(--text-primary);">
+                            <span style="margin-right: 0.5rem;">Открытые</span>
+                            <input type="number" id="open-questions" min="0" max="10" value="0" style="width: 60px; padding: 0.5rem; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary);">
+                        </label>
+                    </div>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">В открытых вопросах нужно написать ответ, который оценит ИИ</p>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">Сложность</label>
+                <select id="difficulty" style="width: 100%; padding: 0.75rem; background-color: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary);">
+                    <option value="easy">Легкий</option>
+                    <option value="medium" selected>Средний</option>
+                    <option value="hard">Сложный</option>
+                </select>
+            </div>
+            <button class="btn" id="create-test-confirm" style="width: 100%; background-color: var(--accent-blue);">
+                Создать
+            </button>
+        </div>
+    </div>
+
+    <!-- Add Markdown parser -->
+    <script src="/static/lib/marked.min.js"></script>
+    <script src="/static/script.js"></script>
+</body>
+</html>
